@@ -16,6 +16,7 @@ class Sub_categoriaSeeder extends Seeder
     public function run()
     {
         Sub_categoria::create([
+            'categoria_id'      =>  '1',
             'nombre'      =>  'Sub categoria 1',
             'descripcion'    =>  'Pinturas',
         ]);

@@ -3,19 +3,13 @@
 @section('title', 'Admin')
 
 @section('css')
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.bootstrap5.min.css">
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
-    />
+
 @stop
 
 @section('content')   
 <div class="card">
     <div class="card-header">
-        <a href="{{ route('unidades.create') }}" class="btn btn-success"><i class="bi bi-plus-square-fill"></i> Nueva Unidad de Medida</a>
+        <a href="{{ route('unidades.create') }}" class="btn btn-success"><i class="fas fa-plus-circle"></i> Nueva Unidad de Medida</a>
     </div>  
     <div class="card-body"></div>
     @if(Session::has('message'))
@@ -40,13 +34,12 @@
                 <td>{{ $unidad->codigo }}</td>
                 <td>{{ $unidad->nombre }}</td>
                 <td>
-                    <form action="{{ route('unidades.destroy',$unidad->id) }}" method="POST">
-                        <a href="{{ route('unidades.edit', $unidad) }}" class="btn btn-primary btn-sm" ><i class="bi bi-pencil-square"></i></a>
+                    <form action="{{ route('unidades.destroy',$unidad->id) }}" method="POST" class="formDelete">
+                        <a href="{{ route('unidades.edit', $unidad) }}" class="btn btn-primary btn-sm" ><i class="fas fa-pencil-alt"></i></a>
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm" title="Borrar cat"
-                        onclick="alert('Esta seguro de eliminar?')">
-                        <i class="bi bi-trash text-light"></i></button>
+                        <button type="submit" class="btn btn-danger btn-sm" title="Borrar cat">
+                            <i class="fas fa-trash text-light"></i></button>
                     </form>
                 </td>
             </tr>
@@ -58,11 +51,24 @@
 @stop
 
 @section('js')
-    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.3.0/js/dataTables.responsive.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.3.0/js/responsive.bootstrap5.min.js"></script>
+    @if(session('eliminar') == 'ok')
+        <script>
+            Swal.fire(
+                'Eliminado!',
+                'La unidad de medida ha sido Eliminado con Exito.',
+                'success'
+            )
+        </script>
+    @endif
+    @if(session('eliminar') == 'no')
+        <script>
+            Swal.fire(
+                'Error!',
+                'No se puede eliminar tiene dependencias',
+                'error'
+            )
+        </script>
+    @endif
   
 <script>
     $('#unidades').DataTable({
@@ -80,6 +86,24 @@
                 'previous':"Anterior"
             }
         }
+    });
+
+    $('.formDelete').submit( function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Esta seguro de Eliminar Unidad/Medida?',
+            text: "si no lo esta puede cancelar la accion!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Si, Eliminar!',
+            cancelButtonText: 'Cancelar'
+            }).then((result) => {
+            if (result.isConfirmed) {
+                this.submit();
+            }
+            });
     });
 </script>
 

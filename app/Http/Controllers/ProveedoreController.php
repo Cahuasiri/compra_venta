@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Models\Proveedore;
 use App\Models\Detalle_ingreso_producto;
 use App\Models\Compra_producto;
@@ -68,15 +69,15 @@ class ProveedoreController extends Controller
 
     public function destroy($id)
     {   
-        //controlando si tiene dependencias
-        $compra_producto = Compra_producto::where('proveedor_id',$id)->first();
-        if($compra_producto === null){
-            $proveedore = Proveedore::find($id);
-            $proveedore->delete();
-            return redirect('proveedores')->with('message','Eliminado Correctamente');
+        $proveedore = Proveedore::find($id);
+        $compra_producto = DB::table('compra_productos')->where('proveedor_id',$id)->get();
+        $registros= count($compra_producto);
+        if($registros >= '1'){
+            return redirect('proveedores')->with('eliminar', 'no');
         }
         else{
-            return redirect('proveedores')->with('message','Proveedor tiene dependencias No se puede borrar');
-        }        
+            $proveedore->delete();
+            return redirect('proveedores')->with('eliminar', 'ok');
+        }
     }
 }

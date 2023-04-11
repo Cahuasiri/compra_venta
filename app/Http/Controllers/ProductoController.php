@@ -42,7 +42,7 @@ class ProductoController extends Controller
     {
         //instanciar los modelos de las tablas productos
         $productos = new Producto();
-
+        $stock = 0;
         //sacando datos del formulario
         $productos->barCodigo = $request->get('barCodigo');
         $productos->categoria_id = $request->get('categoria_id');
@@ -52,6 +52,7 @@ class ProductoController extends Controller
         $productos->slug = Str::slug($request->get('nombre_producto'));
         $productos->unidad_producto_id = $request->get('unidad_producto_id');
         $productos->descripcion = $request->get('descripcion'); 
+        $productos->stock = $stock;
          
         //subir la imagen al proyecto
         if($imagen = $request->hasFile('imagen')){
@@ -161,15 +162,21 @@ class ProductoController extends Controller
 
     public function destroy($id)
     {
-        //Controlando si tiene dependencias
-        $detalle_compra= Detalle_compra::where('producto_id',$id)->first();
-        if($detalle_compra === null){
-            $producto = Producto::find($id);  
-            $producto->delete();
-            return redirect('productos')->with('message','Producto eliminado Correctamente')->with('color','success');
+        $producto= Producto::find($id);
+        $detalle_compra = DB::table('detalle_compras')->where('producto_id',$id)->get();
+        $registros= count($detalle_compra);
+        if($registros >= '1'){
+            return redirect('productos')->with('eliminar', 'no');
         }
         else{
-            return redirect('productos')->with('message','El producto tiene dependencias no se puede borrar')->with('color','danger');    
+            $producto->delete();
+            return redirect('productos')->with('eliminar', 'ok');
         }
+    }
+
+    public function listaSubcatPorCategoria(Request $request, $id){
+        $categoria_id = $request->get('id');
+        $subCategorias = Sub_categoria::where('categoria_id','=',$categoria_id)->get();
+        return response()->json(['subCategorias'=>$subCategorias]);
     }
 }

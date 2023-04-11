@@ -17,7 +17,10 @@ use App\Models\Marca;
 use App\Models\Unidad_producto;
 use App\Models\Sub_categoria;
 use PDF;
-
+use App\Models\Datos_empresa;
+use App\Models\Pago_de_Credito;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class Compra_productoController extends Controller
 {
@@ -40,26 +43,42 @@ class Compra_productoController extends Controller
          $productos = Producto::where('estado','A')->get();
          $almacenes = Almacene::all();
          $tipo_pagos = Tipo_pago::all();
-
+         $datos_empresa = Datos_empresa::find(1);
          //para crear un nuevo producto
          $categorias = Categoria::all();
          $marcas     = Marca::all();
          $sub_categorias = Sub_categoria::all();
          $unidad_productos = Unidad_producto::all();
+         
+         //sacar compra referencia para incrementar en 1
+         $compra = Compra_producto::orderBy('referencia','desc')->limit(1)->get();
+         //dd($compra[0]['referencia']);
+         if(empty($compra) || ($compra[0]['referencia'])){
+            $referencia = $compra[0]['referencia'];
+            $newReferencia = $referencia +1;
+           // dd("entro");
+         }
+         else{
+            $newReferencia = $datos_empresa->compra_referencia;
+         }
+         
 
+         //saca la fecha
          $date = new DateTime(); // Date object using current date and time
-         $dt= $date->format('Y-m-d\TH:i:s'); 
+         $dt= $date->format('Y-m-d'); 
 
         return view('compra_productos.create', ['productos'=>$productos, 'proveedores'=>$proveedores,
                      'almacenes'=>$almacenes,'dt'=>$dt,'tipo_pagos'=>$tipo_pagos,
                      'categorias'=>$categorias,
                      'marcas'=>$marcas, 'sub_categorias'=>$sub_categorias,
-                     'unidad_productos'=>$unidad_productos]);
+                     'unidad_productos'=>$unidad_productos,'datos_empresa'=>$datos_empresa,
+                     'referencia'=>$newReferencia]);
     }
 
     public function store(Request $request)
     {   
         $compra_producto = new Compra_producto();
+        $datos_empresa = Datos_empresa::find(1);
         $compra_producto->fecha = $request->get('fecha_compra');
         $compra_producto->referencia = $request->get('referencia');
         $compra_producto->proveedor_id = $request->get('proveedor_id');
@@ -72,20 +91,41 @@ class Compra_productoController extends Controller
         $costo = $request->get('costo');
         $precio = $request->get('precio');
 
-        //calcular el costo total provisional
-        if($producto_id != null){
-            $costo_total = 0;
-            for($i=0; $i < count($producto_id); $i++){
-                $costo_total = $costo_total + $cantidad[$i]*$costo[$i];
-            }
-            $compra_producto->costo_total = $costo_total; 
-            //Guardar Producto en la tabla
-            $compra_producto->save();
-        }
+       $compra_producto->sub_total = $request->get('sub_total');
+       $compra_producto->total = $request->get('total');
+       $compra_producto->descuento = $request->get('descuento_mo');
+
+       // si la opcion es efectivo
+       if($compra_producto->tipo_pago_id == 1){
+            $compra_producto->monto_pagado = $request->get('total');
+       }
+      
+       //registrar si existe nro de Bancp
+       if($request->get('nro_banco') != null){
+            $compra_producto->nro_banco = $request->get('nro_banco');
+            $compra_producto->monto_pagado = $request->get('total');
+       }
+       //registrar si existe nro- Cheque
+       if($request->get('nro_cheque') != null){
+            $compra_producto->nro_cheque = $request->get('nro_cheque');
+            $compra_producto->monto_pagado = $request->get('total');
+       }
+       //registrar si existe si xiste fecha limite
+       if($request->get('fecha_limite') != null){
+            $compra_producto->fecha_limite_pago = $request->get('fecha_limite');
+       }
+       //usuario
+       $usuario_id = Auth::id();
+       $compra_producto->usuario_id = $usuario_id;
+
+       //Guardar los datos en la BD
+       $compra_producto->save();
 
         //buscar la ultima compra ingresado
         $ultimaCompra = Compra_producto::latest()->first();
         $compra_id = $ultimaCompra->id;
+        //sacar usuario de compra
+        $user = User::find($ultimaCompra->usuario_id);
 
         if($producto_id != null){
            
@@ -112,7 +152,10 @@ class Compra_productoController extends Controller
                                         ->where('compra_producto_id', $compra_id)
                                         ->get();
         $proveedore = Proveedore::find($compra_producto->proveedor_id);
-       return view('compra_productos.recibo', ['ultimaCompra'=>$ultimaCompra, 'detalle_compras'=>$detalle_compras, 'proveedore'=>$proveedore]);
+       return view('compra_productos.recibo', ['ultimaCompra'=>$ultimaCompra, 'detalle_compras'=>$detalle_compras, 
+                                            'proveedore'=>$proveedore, 
+                                            'datos_empresa'=>$datos_empresa,
+                                            'user_name'=>$user->name]);
 
       // return view('compra_productos.recibo');
     }
@@ -121,11 +164,14 @@ class Compra_productoController extends Controller
     {
         //buscar para imprimir
         $compraProducto = Compra_producto::find($id);
+        $datos_empresa = Datos_empresa::find(1);
         $detalle_compras = Detalle_compra::JOIN('productos','productos.id','=','detalle_compras.producto_id')
                                         ->where('compra_producto_id', $id)
                                         ->get();
         $proveedore = Proveedore::find($compraProducto->proveedor_id);
-       return view('compra_productos.recibo', ['ultimaCompra'=>$compraProducto, 'detalle_compras'=>$detalle_compras, 'proveedore'=>$proveedore]);
+        $user = User::find($compraProducto->usuario_id);
+       return view('compra_productos.recibo', ['ultimaCompra'=>$compraProducto, 'detalle_compras'=>$detalle_compras, 
+                'proveedore'=>$proveedore, 'datos_empresa'=>$datos_empresa, 'user_name'=>$user->name]);
     }
 
     public function edit($id)
@@ -145,6 +191,8 @@ class Compra_productoController extends Controller
 
     public function update(Request $request, $id)
     {
+        $datos_empresa = Datos_empresa::find(1);
+
         $compra_producto = Compra_producto::find($id);
         $compra_producto->fecha = $request->get('fecha_compra');
         $compra_producto->referencia = $request->get('referencia');
@@ -158,16 +206,32 @@ class Compra_productoController extends Controller
         $costo = $request->get('costo');
         $precio = $request->get('precio');
 
-        //calcular el costo total provisional costo = a cueanto estoy comprando y precio a cuanto vender
-        if($producto_id != null){
-            $costo_total = 0;
-            for($i=0; $i < count($producto_id); $i++){
-                $costo_total = $costo_total + $cantidad[$i]*$costo[$i];
-            }
-            $compra_producto->costo_total = $costo_total; 
-            //Guardar Producto en la tabla
-            $compra_producto->save();
+        $compra_producto->sub_total = $request->get('sub_total');
+        $compra_producto->total = $request->get('total');
+        $compra_producto->descuento = $request->get('descuento_mo');
+
+        // si la opcion es efectivo
+        if($compra_producto->tipo_pago_id == 1){
+             $compra_producto->monto_pagado = $request->get('total');
         }
+       
+        //registrar si existe nro de Bancp
+        if($request->get('nro_banco') != null){
+             $compra_producto->nro_banco = $request->get('nro_banco');
+             $compra_producto->monto_pagado = $request->get('total');
+        }
+        //registrar si existe nro- Cheque
+        if($request->get('nro_cheque') != null){
+             $compra_producto->nro_cheque = $request->get('nro_cheque');
+             $compra_producto->monto_pagado = $request->get('total');
+        }
+        //registrar si existe si xiste fecha limite
+        if($request->get('fecha_limite') != null){
+             $compra_producto->fecha_limite_pago = $request->get('fecha_limite');
+        }
+
+            //Guardar los datos en la BD
+            $compra_producto->save();
 
         //buscar la ultima compra ingresado
        
@@ -196,25 +260,32 @@ class Compra_productoController extends Controller
 
         //buscar para imprimir
         $compraProducto = Compra_producto::find($id);
+        $user = User::find($compraProducto->usuario_id);
+        //dd($user->name);
         $detalle_compras = Detalle_compra::JOIN('productos','productos.id','=','detalle_compras.producto_id')
                                         ->where('compra_producto_id', $id)
                                         ->get();
         $proveedore = Proveedore::find($compra_producto->proveedor_id);
-       return view('compra_productos.recibo', ['ultimaCompra'=>$compraProducto, 'detalle_compras'=>$detalle_compras, 'proveedore'=>$proveedore]);
+       return view('compra_productos.recibo', ['ultimaCompra'=>$compraProducto, 'detalle_compras'=>$detalle_compras, 
+                        'proveedore'=>$proveedore, 'datos_empresa'=>$datos_empresa,
+                        'user_name'=>$user->name]);
        //return redirect('compra_productos');
     }
 
     public function destroy($id)
     {
-        $detalle_compras = Detalle_compra::where('compra_producto_id',$id);
-        $detalle_compras->delete();
-
-        $compra = Compra_producto::find($id);
-        $compra->delete();
-
-        //actualizar stock de la tabla productos
-
-        return redirect('compra_productos');
+        $pago_credito = DB::table('pago_de_creditos')->where('compra_id',$id)->get();
+        $registros= count($pago_credito);
+        if($registros >= '1'){
+            return redirect('compra_productos')->with('eliminar', 'no');
+        }
+        else{
+            $detalle_compras = Detalle_compra::where('compra_producto_id',$id);
+            $detalle_compras->delete();
+            $compra = Compra_producto::find($id);
+            $compra->delete();
+            return redirect('compra_productos')->with('eliminar', 'ok');
+        }
     }
 
     public function search(Request $request){
@@ -258,5 +329,27 @@ class Compra_productoController extends Controller
         return $pdf->download('demo.pdf');
 
         //return view();
+    }
+    public function registrar_pago(Request $request, $id){
+
+        $compra_id = $request->get('compra_id');
+        $monto_a_pagar = $request->get('monto_a_pagar');
+        $fecha_pago = $request->get('fecha_pago');
+
+        $pagoCredito = new Pago_de_credito();
+
+        $pagoCredito->compra_id = $compra_id;
+        $pagoCredito->monto = $monto_a_pagar;
+        $pagoCredito->fecha_pago = $fecha_pago;
+
+        $pagoCredito->save();
+
+        $compra = Compra_producto::find($compra_id);
+        $suma_monto = $compra->monto_pagado + $monto_a_pagar;
+        $compra->monto_pagado = $suma_monto;
+
+        $compra->save();
+
+        return redirect('compra_productos');
     }
 }

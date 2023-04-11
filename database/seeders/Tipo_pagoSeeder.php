@@ -21,5 +21,11 @@ class Tipo_pagoSeeder extends Seeder
         Tipo_pago::create([
             'nombre'      =>  'Credito',
         ]);
+        Tipo_pago::create([
+            'nombre'      =>  'Transf - Bancaria',
+        ]);
+        Tipo_pago::create([
+            'nombre'      =>  'Cheque',
+        ]);
     }
 }

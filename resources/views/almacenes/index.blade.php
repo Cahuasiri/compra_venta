@@ -3,19 +3,13 @@
 @section('title', 'Admin')
 
 @section('css')
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.bootstrap5.min.css">
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
-    />
+
 @stop
 
 @section('content')   
 <div class="card">
     <div class="card-header">
-        <a href="{{ route('almacenes.create') }}" class="btn btn-primary"><i class="bi bi-plus-square-fill"></i> CREAR</a>
+        <a href="{{ route('almacenes.create') }}" class="btn btn-primary"><i class="fas fa-plus-circle"></i> CREAR</a>
     </div>
     <div class="card-body">
         @if(Session::has('message'))
@@ -40,11 +34,11 @@
                     <td>{{ $almacen->nombre }}</td>
                     <td>{{ $almacen->ubicacion }}</td>                
                     <td>
-                    <form action="{{ route('almacenes.destroy',$almacen->id) }}" method="POST">
-                            <a href="{{ route('almacenes.edit', $almacen) }}" class="btn btn-primary"><i class="bi bi-pencil-square"></i> Editar</a>
+                    <form action="{{ route('almacenes.destroy',$almacen->id) }}" method="POST" class="formDelete">
+                            <a href="{{ route('almacenes.edit', $almacen) }}" class="btn btn-primary"><i class="fas fa-pencil-alt"></i> Editar</a>
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger"><i class="bi bi-trash text-light"></i> Borrar</button>
+                            <button type="submit" class="btn btn-danger"><i class="fas fa-trash text-light"></i> Borrar</button>
                         </form>
                     </td>
                 </tr>
@@ -56,12 +50,24 @@
 @stop
 
 @section('js')
-    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.3.0/js/dataTables.responsive.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.3.0/js/responsive.bootstrap5.min.js"></script>
-  
+    @if(session('eliminar') == 'ok')
+        <script>
+            Swal.fire(
+                'Eliminado!',
+                'El Almacen ha sido Eliminado con Exito.',
+                'success'
+            )
+        </script>
+    @endif
+    @if(session('eliminar') == 'no')
+        <script>
+            Swal.fire(
+                'Error!',
+                'No se puede eliminar tiene dependencias',
+                'error'
+            )
+        </script>
+    @endif
 <script>
     $('#almacenes').DataTable({
         responsive:true,
@@ -78,6 +84,23 @@
                 'previous':"Anterior"
             }
         }
+    });
+    $('.formDelete').submit( function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Esta seguro de Eliminar Almacen?',
+            text: "si no lo esta puede cancelar la accion!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Si, Eliminar!',
+            cancelButtonText: 'Cancelar'
+            }).then((result) => {
+            if (result.isConfirmed) {
+                this.submit();
+            }
+            });
     });
 </script>
 @stop

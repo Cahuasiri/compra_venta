@@ -11,6 +11,10 @@ use App\Models\Metodo_Pago;
 use App\Models\Detalle_venta;
 use App\Models\Grupo_cliente;
 use DateTime;
+use App\Models\Datos_empresa;
+use App\Models\Detalle_compra;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class VentaController extends Controller
 {
@@ -33,13 +37,38 @@ class VentaController extends Controller
         
         $clientes = Cliente::all();
         $productos = Producto::where('estado','A')->get();       
-        $metodo_pagos = Metodo_pago::all();
+        $metodo_pagos = Metodo_pago::all();        
         $grupo_clientes = Grupo_cliente::all();
+        $datos_empresa = Datos_empresa::find(1);
+        
+        //sacar ventareferencia para incrementar en 1
+        $venta = Venta::orderBy('nro_referencia','desc')->limit(1)->get();
+        if(empty($venta)){
+            $referencia = $venta[0]['nro_referencia'];
+            $newReferencia = $referencia +1;
+        }
+        else{
+            $newReferencia = $datos_empresa->venta_referencia;
+        }
+
+        $venta = Venta::orderBy('nro_factura','desc')->limit(1)->get();
+        if(empty($venta)){
+            $nro_factura = $venta[0]['nro_factura'];
+            $newFactura = $nro_factura +1; 
+        }
+        else{
+            $newFactura = ""; 
+        }
+       
 
         $date = new DateTime(); // Date object using current date and time
         $dt= $date->format('Y-m-d\TH:i:s'); 
        
-       return view('ventas.create', ['productos'=>$productos, 'clientes'=>$clientes, 'dt'=>$dt, 'metodo_pagos'=>$metodo_pagos, 'grupo_clientes'=>$grupo_clientes]);
+       return view('ventas.create', ['productos'=>$productos, 'clientes'=>$clientes, 'dt'=>$dt, 
+                    'metodo_pagos'=>$metodo_pagos, 'grupo_clientes'=>$grupo_clientes, 
+                    'datos_empresa'=>$datos_empresa,
+                    'nro_referencia'=>$newReferencia,
+                    'nro_factura'=>$newFactura]);
       // return view('ventas.recibo');
     }
 
@@ -61,6 +90,10 @@ class VentaController extends Controller
         $producto_id = $request->get('product_id');
         $cantidad = $request->get('cantidad');
         $precio_unitario = $request->get('precio_unitario');
+
+        //usuario
+        $usuario_id = Auth::id();
+        $venta->usuario_id = $usuario_id;
        
         //guardar venta en la base de datos
         $venta->save();
@@ -68,6 +101,9 @@ class VentaController extends Controller
         //buscar la ultima venta ingresado
         $ultimaVenta = Venta::latest()->first();
         $venta_id = $ultimaVenta->id;
+
+        //sacar usuario de venta
+        $user = User::find($ultimaVenta->usuario_id);
 
         if($producto_id != null){
            
@@ -92,7 +128,11 @@ class VentaController extends Controller
                                         ->where('venta_id', $venta_id)
                                         ->get();
         $cliente = Cliente::find($venta->cliente_id);
-       return view('ventas.recibo', ['ultimaVenta'=>$ultimaVenta, 'detalle_ventas'=>$detalle_ventas, 'cliente'=>$cliente]);
+        $datos_empresa = Datos_empresa::find(1);
+       return view('ventas.recibo', ['ultimaVenta'=>$ultimaVenta, 'detalle_ventas'=>$detalle_ventas, 
+                                'cliente'=>$cliente,
+                                'datos_empresa'=>$datos_empresa,
+                                'user_name'=>$user->name]);
     }
 
     public function show($id)
@@ -103,7 +143,10 @@ class VentaController extends Controller
                                         ->where('venta_id', $id)
                                         ->get();
         $cliente = Cliente::find($venta->cliente_id);
-       return view('ventas.recibo', ['ultimaVenta'=>$venta, 'detalle_ventas'=>$detalle_ventas, 'cliente'=>$cliente]);
+        $user = User::find($venta->usuario_id);
+        $datos_empresa = Datos_empresa::find(1);
+       return view('ventas.recibo', ['ultimaVenta'=>$venta, 'detalle_ventas'=>$detalle_ventas, 
+       'cliente'=>$cliente, 'datos_empresa'=>$datos_empresa,'user_name'=>$user->name]);
     }
 
     public function edit($id)
@@ -167,25 +210,27 @@ class VentaController extends Controller
         }     
         //buscar para imprimir
         $venta = Venta::find($id);
+        $user = User::find($venta->usuario_id);
         $detalle_ventas = Detalle_venta::JOIN('productos','productos.id','=','detalle_ventas.producto_id')
                                         ->where('venta_id', $id)
                                         ->get();
         $cliente = Cliente::find($venta->cliente_id);
-       return view('ventas.recibo', ['ultimaVenta'=>$venta, 'detalle_ventas'=>$detalle_ventas, 'cliente'=>$cliente]);
+        $datos_empresa = Datos_empresa::find(1);
+       return view('ventas.recibo', ['ultimaVenta'=>$venta, 'detalle_ventas'=>$detalle_ventas, 
+                                'cliente'=>$cliente, 'datos_empresa'=>$datos_empresa,
+                                'user_name'=>$user->name]);
        //return redirect('ventas');
     }
 
     public function destroy($id)
-    {
+    {   
         $detalle_ventas = Detalle_venta::where('venta_id',$id);
         $detalle_ventas->delete();
 
         $venta = Venta::find($id);
         $venta->delete();
 
-        //actualizar stock de la tabla productos
-
-        return redirect('ventas');
+        return redirect('ventas')->with('eliminar', 'ok');
     }
 
     public function search(Request $request){
@@ -210,13 +255,23 @@ class VentaController extends Controller
 
     public function bproducto($id){
         $id = $_GET['id'];
-        $producto = DB::table('productos')
-                        ->JOIN('detalle_compras','productos.id','=','detalle_compras.producto_id')
-                        ->select('productos.*','detalle_compras.costoVenta')
-                        ->where('productos.id',$id)
-                        ->orderBy('detalle_compras.id','desc')
-                        ->latest()->first();
-       //dd($producto);                    
-       return response()->json(['mensaje'=>'mensaje correcto','producto'=>$producto]);      
+
+        $detalle_compras = Detalle_compra::where('producto_id',$id)->get();
+        $cant = count($detalle_compras);
+
+        if($cant > 0){
+            $producto = DB::table('productos')
+                            ->JOIN('detalle_compras','productos.id','=','detalle_compras.producto_id')
+                            ->select('productos.*','detalle_compras.costoVenta')
+                            ->where('productos.id',$id)
+                            ->orderBy('detalle_compras.id','desc')
+                            ->latest()->first();
+            //dd($producto);                    
+            return response()->json(['mensaje'=>'mensaje correcto','producto'=>$producto]);
+        }
+        else{
+            $producto = Producto::find($id);
+            return response()->json(['mensaje'=>'incorrecto', 'producto'=>$producto]);
+        }      
     }
 }

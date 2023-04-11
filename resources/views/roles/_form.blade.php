@@ -1,11 +1,12 @@
 @csrf
-    <div class="mb-3">
+
+    <div class="mb-3 col-6">
         <label class="form-label">Roles</label>
         <input type="text" class="form-control" name="name" value="{{ 
             old('role', $role->name) }}">
     </div>
 
-    <div class="mb-3">
+    <div class="mb-3 col-6">
         <label class="form-label">Descripcion</label>
         <textarea class="form-control" id="descripcion" rows="3" name="guard_name">{{ old('guard_name', $role->guard_name) }}</textarea>
     </div>  

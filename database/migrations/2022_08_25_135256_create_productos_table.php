@@ -35,6 +35,7 @@ return new class extends Migration
             $table->integer('stock')->nullable();
             $table->string('imagen')->nullable();
             $table->string('descripcion')->nullable();
+            $table->integer('usuario_id')->nullable();
             $table->char('estado',2)->default('A');
 
             $table->timestamps();

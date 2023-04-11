@@ -63,8 +63,10 @@ return [
     |
     */
 
-    'logo' => '<b>Las</b>Churas',
-    'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+     'logo' => '<b>Las</b>Churas',
+    // 'logo' => ' ',
+    // 'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+    'logo_img' => '/imagen/logo_churas.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
@@ -85,7 +87,8 @@ return [
     'preloader' => [
         'enabled' => false,
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+            // 'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+            'path' => '/imagen/20221114175618_logo_churas.png',
             'alt' => 'AdminLTE Preloader Image',
             'effect' => 'animation__shake',
             'width' => 60,
@@ -301,13 +304,15 @@ return [
                             ],
                             [
                                 'text'  =>  'Imprimir codigo barra',
-                                'url'   =>  '#',
+                                'url'   =>  'imprimir_codigos',
                                 'icon'  =>  'fas fa-barcode',
+                                //'can'  =>  'imprimir_codigos'
                             ],
                             [
                                 'text'  =>  'Ajuste Cantidad',
-                                'url'   =>  '#',
+                                'url'   =>  'ajuste_cantidad',
                                 'icon'  =>  'fas fa-cog',
+                                //'can'  =>  'ajuste_cantidad'
                             ]
                         ],
         ],
@@ -407,13 +412,18 @@ return [
             'icon'         => 'fas fa-cog',             
             'submenu'      => [
                         [   'text'      =>  'Config. System',
-                            'url'       =>  '#',
+                            'url'       =>  'datos_empresa',
                             'icon'      =>  'fas fa-cog',
                         ],
                         [   'text'      =>  'Categorias',
                             'url'       =>  'categorias',
                             'icon'      =>  'fas fa-archive',
                             'can'       =>  'categorias.index',
+                        ],
+                        [   'text'      =>  'Sub Categorias',
+                            'url'       =>  'sub_categorias',
+                            'icon'      =>  'fas fa-archive',
+                            //'can'       =>  'sub_categorias.index',
                         ],
                         [
                             'text'      =>  'Marcas',
@@ -431,19 +441,28 @@ return [
                             'text'      =>  'Almacenes',
                             'url'       =>  'almacenes',
                             'icon'      =>  'fas fa-store-slash',
-                            'can'       =>  'almacenes.index'
+                            //'can'       =>  'almacenes.index'
                         ],
             ], 
 
         ],
-
         // Sidebar items: 
         ['header' => 'REPORTES'],      
-        [
-            'text' => 'blog',
-            'url'  => 'admin/blog',
-            'can'  => 'manage-blog',
-        ],     
+            [
+                'text'      => 'Reporte de Ventas',
+                'url'       => 'reporte_ventas',
+                'icon'      =>  'fas fa-clipboard-list',
+            ],
+            [
+                'text'      => 'Reporte de Compras',
+                'url'       => 'reporte_compras',
+                'icon'      =>  'fas fa-clipboard-list',
+            ],
+            [
+                'text'      => 'Reporte de Productos',
+                'url'       => 'reporte_productos',
+                'icon'      =>  'fas fa-clipboard-list',
+            ],      
     ],
 
     /*
@@ -482,12 +501,17 @@ return [
 
     'plugins' => [
         'Datatables' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',
                     'asset' => false,
                     'location' => '//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => false,
+                    'location' => '//cdn.datatables.net/responsive/2.4.0/js/dataTables.responsive.min.js',
                 ],
                 [
                     'type' => 'js',
@@ -499,20 +523,30 @@ return [
                     'asset' => false,
                     'location' => '//cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css',
                 ],
+                [
+                    'type' => 'css',
+                    'asset' => false,
+                    'location' => 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => false,
+                    'location' => '//cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js',
+                ],
             ],
         ],
         'Select2' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',
                     'asset' => false,
-                    'location' => '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js',
+                    'location' => '//cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js',
                 ],
                 [
                     'type' => 'css',
                     'asset' => false,
-                    'location' => '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.css',
+                    'location' => '//cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css',
                 ],
             ],
         ],
@@ -527,12 +561,12 @@ return [
             ],
         ],
         'Sweetalert2' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',
                     'asset' => false,
-                    'location' => '//cdn.jsdelivr.net/npm/sweetalert2@8',
+                    'location' => '//cdn.jsdelivr.net/npm/sweetalert2@11',
                 ],
             ],
         ],
@@ -548,9 +582,10 @@ return [
                     'type' => 'js',
                     'asset' => false,
                     'location' => '//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js',
-                ],
+                ],                
             ],
         ],
+
     ],
 
     /*

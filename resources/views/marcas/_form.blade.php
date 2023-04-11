@@ -1,14 +1,14 @@
 @csrf
 <div class="card">
     <div class="card-body">
-    <div class="mb-3">
+    <div class="mb-3 col-4">
         <label class="form-label">Marca</label>
         <span class="text-xs badge badge-danger">@error('nombre') {{ $message }} @enderror</span>
         <input type="text" class="form-control" name="nombre" value="{{ 
                 old('nombre', $marca->nombre) }}">
         
     </div>
-    <div class="mb-3">
+    <div class="mb-3 col-4">
         <label class="form-label">Descripcion</label>
         <span class="text-xs badge badge-danger">@error('descripcion') {{ $message }} @enderror</span>
         <textarea class="form-control" id="descripcion" rows="3" name="descripcion">{{ old('descripcion', $marca->descripcion) }}</textarea>

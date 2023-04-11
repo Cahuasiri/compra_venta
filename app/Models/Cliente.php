@@ -12,5 +12,8 @@ class Cliente extends Model
     public function cotizaciones(){
         return $this->HasMany(Cotizacione::class);
     }
+    public function ventas(){
+        return $this->HasMany(Venta::class);
+    }
 
 }

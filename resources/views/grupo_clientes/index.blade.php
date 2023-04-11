@@ -3,19 +3,13 @@
 @section('title', 'Admin')
 
 @section('css')
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.bootstrap5.min.css">
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
-    />
+
 @stop
 
 @section('content')   
 <div class="card">
     <div class="card-header">
-        <a href="{{ route('grupo_clientes.create') }}" class="btn btn-success"><i class="bi bi-plus-square-fill"></i> Nuevo Grupo Cliente</a>
+        <a href="{{ route('grupo_clientes.create') }}" class="btn btn-success"><i class="fas fa-plus-circle"></i> Nuevo Grupo Cliente</a>
     </div>  
     <div class="card-body"></div>
     @if(Session::has('message'))
@@ -41,12 +35,12 @@
                 <td>{{ $grupo_cliente->porcentaje }}</td>
                 <td>
                     <form action="{{ route('grupo_clientes.destroy',$grupo_cliente->id) }}" method="POST">
-                        <a href="{{ route('grupo_clientes.edit', $grupo_cliente) }}" class="btn btn-primary btn-sm" ><i class="bi bi-pencil-square"></i></a>
+                        <a href="{{ route('grupo_clientes.edit', $grupo_cliente) }}" class="btn btn-primary btn-sm" ><i class="fas fa-pencil-alt"></i></a>
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-danger btn-sm" title="Borrar cat"
                         onclick="alert('Esta seguro de eliminar?')">
-                        <i class="bi bi-trash text-light"></i></button>
+                        <i class="fas fa-trash text-light"></i></button>
                     </form>
                 </td>
             </tr>

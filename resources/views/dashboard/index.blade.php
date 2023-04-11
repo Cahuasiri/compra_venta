@@ -97,7 +97,7 @@
                                             @if($producto->stock > 7)
                                                 <span class="badge bg-success" style="font-size: medium">{{ $producto->stock }}</span>
                                             @endif
-                                            @if(($producto->stock < 7)  && ($producto->stock > 3))
+                                            @if(($producto->stock <= 7)  && ($producto->stock >= 3))
                                                 <span class="badge bg-warning" style="font-size: medium">{{ $producto->stock }}</span>
                                             @endif
                                             @if($producto->stock < 3)
@@ -169,9 +169,9 @@
 @stop
 
 @section('css')
-    <link rel="stylesheet" href="/css/admin_custom.css">
+   
 @stop
 
 @section('js')
-    <script> console.log('Hi!'); </script>
+  
 @stop

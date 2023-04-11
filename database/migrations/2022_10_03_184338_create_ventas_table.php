@@ -22,7 +22,7 @@ return new class extends Migration
             $table->unsignedBigInteger('metodo_pago_id');
             $table->foreign('metodo_pago_id')->references('id')->on('metodo_pagos');
 
-            $table->dateTime('fecha_venta');
+            $table->date('fecha_venta');
             $table->string('nro_referencia');
             $table->string('nro_factura');
             $table->double('sub_total',8,2);
@@ -31,6 +31,7 @@ return new class extends Migration
             $table->double('descuento',8,2);
             $table->double('total',8,2);
             $table->string('descripcion')->nullable();
+            $table->integer('usuario_id')->nullable();
 
             $table->timestamps();
         });

@@ -14,7 +14,7 @@
                         @endforeach           
                 </select>
             </div>
-            <div class="mb-6">
+            <div class="mb-6" id="sub">
                 <label class="form-label">Sub Categoria</label>
                 <select class="form-control" name="sub_categoria_id" id="sub_categoria_id" required>
                     <option value=""> Sub Category</option>
@@ -49,12 +49,12 @@
                 </select>
             </div>
             <div class="mb-6">
-                <label class="form-label">Slug</label>
-                <input type="text" class="form-control" name="slug" value="" id="slug">               
-            </div>
-            <div class="mb-6">
                 <label class="form-label">Descripcion</label>
                 <textarea class="form-control" id="descripcion" rows="3" name="descripcion"></textarea>
             </div>         
         </div>        
     </div>
+
+<script>
+   
+</script>

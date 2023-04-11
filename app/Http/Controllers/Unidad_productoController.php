@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Models\Unidad_producto;
 use App\Models\Producto;
 
@@ -107,15 +108,15 @@ class Unidad_productoController extends Controller
      */
     public function destroy($id)
     {
-         //Controlando si tiene dependencias
-         $producto = Producto::where('unidad_producto_id',$id)->first();
-         if($producto === null){
-             $unidad = Unidad_producto::find($id);  
-             $unidad->delete();
-             return redirect('unidades')->with('message','Eliminado Correctamente');
-         }
-         else{
-             return redirect('unidades')->with('message','La Unidad tiene dependencias no se puede borrar');    
-         }
+        $unidad = Unidad_producto::find($id);
+        $producto = DB::table('productos')->where('unidad_producto_id',$id)->get();
+        $registros= count($producto);
+        if($registros >= '1'){
+            return redirect('unidades')->with('eliminar', 'no');
+        }
+        else{
+            $unidad->delete();
+            return redirect('unidades')->with('eliminar', 'ok');
+        } 
     }
 }

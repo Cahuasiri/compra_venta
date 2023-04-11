@@ -1,7 +1,7 @@
 @extends('adminlte::page')
 
 @section('content_header')
-<h4>CREAR CATEGORIAS</h4>
+<h4>CREAR ROLES</h4>
 @stop
 
 @section('content')   

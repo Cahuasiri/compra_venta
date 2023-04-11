@@ -17,7 +17,7 @@
             </div>
             <div class="col-sm-4">
                 <label for="">Referencia/Nro. Orden <span>*</span></label>
-                <input type="text" class="form-control" name="referencia" value="" required>
+                <input type="text" class="form-control" name="referencia" value="{{$referencia}}" placeholder="" required>
             </div>
         </div>
         <div class="row mt-3">
@@ -109,7 +109,7 @@
                                     <div class="input-group-text">
                                         Descuento
                                     </div>    
-                                    <input type="number" class="form-control" name="descuento_porcentaje" id="descuento_porcentaje" value="0" placeholder="0.0" step="1" required>
+                                    <input type="number" class="form-control" name="descuento_porcentaje" id="descuento_porcentaje" value="0" placeholder="0.0" step="1" min="0"required>
                                     <div class="input-group-text">
                                         %
                                     </div> 
@@ -316,7 +316,7 @@
     });
 
     document.getElementById("producto_id").onchange = function(){
-
+        var sub_total=0;
         var producto_id = document.getElementById("producto_id").value;
         //alert(producto_id);
         $.ajax({
@@ -325,13 +325,32 @@
             data:{"id":producto_id},
 
             success:function(data){
-                var html = '';                
-                $('#capaproductos').append('<tr> <td><input type="hidden" name="product_id[]" value="'+ data.producto.id +'">'+ data.producto.nombre_producto +'</td>' +
-                                            '<td style="text-align: center"><input type="number" name="cantidad[]" value="1" id="cantidad" class="cantidad" style="width:50px" required></td>'+
-                                            '<td style="text-align: center"><input type="hidden" name="precio_unitario[]" id="precio" value="'+data.producto.costoVenta+'" class="precio" style="width:100px">'+data.producto.costoVenta +'</td>' +
-                                            '<td style="text-align: center"><span class="stotal">'+data.producto.costoVenta.toFixed(2)+ '</span></td>' +                                           
-                                            '<td><a href="javascript:void(0);" class="remove_button"><i class="fa fa-trash" style="color: red"></i></a></td>')                                
-                                .append('</tr>');
+                var html = ''; 
+                var ban=0;
+                var product_ids = document.getElementsByName('product_id[]');
+                for (var i = 0; i <product_ids.length; i++) {
+                    var product_id = product_ids[i];
+                    if(data.producto.id == product_id.value){
+                        ban=1;
+                    }
+                }
+                if ((ban==0)){               
+                    $('#capaproductos').append('<tr> <td><input type="hidden" name="product_id[]" value="'+ data.producto.id +'">'+ data.producto.nombre_producto +'</td>' +
+                                                '<td style="text-align: center"><input type="number" name="cantidad[]" value="1" id="cantidad" class="cantidad" style="width:50px" min="1" required></td>'+
+                                                '<td style="text-align: center"><input type="hidden" name="precio_unitario[]" id="precio" value="'+data.producto.costoVenta+'" class="precio" style="width:100px">'+data.producto.costoVenta +'</td>' +
+                                                '<td style="text-align: center"><span class="stotal">'+data.producto.costoVenta.toFixed(2)+ '</span></td>' +                                           
+                                                '<td><a href="javascript:void(0);" class="remove_button"><i class="fa fa-trash" style="color: red"></i></a></td>')                                
+                                    .append('</tr>');
+                    $('#myTable tbody').find('tr').each(function(i,el){
+                        sub_total += parseFloat($(this).find('td').eq(3).text());                
+                    });
+                    // sub_total = sub_total - data.producto.costoVenta;
+                    $('#myTable tfoot tr th').eq(1).text(sub_total.toFixed(2));
+                    $('#total').val(sub_total.toFixed(2));
+                }
+                else{
+                    alert("El Producto "+data.producto.nombre_producto+" ya existe O no hay STOCK");
+                }
                 
             }
         });

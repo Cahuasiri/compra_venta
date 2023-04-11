@@ -76,11 +76,6 @@
                 </div>
             </div>
             <div class="mb-6">
-                <label class="form-label">Slug</label>
-                <span class="text-xs badge badge-danger">@error('slug') {{ $message }} @enderror</span>
-                <input type="text" class="form-control" name="slug" value="{{ old('slug', $producto->slug) }}" id="slug" disabled>               
-            </div>
-            <div class="mb-6">
                 <label class="form-label">Descripcion</label>
                 <span class="text-xs badge badge-danger">@error('descripcion') {{ $message }} @enderror</span>
                 <textarea class="form-control" id="descripcion" rows="3" name="descripcion">{{ old('descripcion', $producto->descripcion) }}</textarea>

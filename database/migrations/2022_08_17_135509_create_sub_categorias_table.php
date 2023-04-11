@@ -13,15 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('personas', function (Blueprint $table) {
+        Schema::create('sub_categorias', function (Blueprint $table) {
             $table->id();
+
+            $table->unsignedBigInteger('categoria_id');
+            $table->foreign('categoria_id')->references('id')->on('categorias');
+            
             $table->string('nombre');
-            $table->string('cedula');
-            $table->char('sexo',12);
-            $table->string('email');
-            $table->string('direccion')->nullable();
-            $table->string('foto')->nullable();
-            $table->char('estado',2)->default('A');
+            $table->string('descripcion')->nullable();
             $table->timestamps();
         });
     }
@@ -33,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('personas');
+        Schema::dropIfExists('sub_categorias');
     }
 };

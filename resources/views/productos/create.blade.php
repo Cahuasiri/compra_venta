@@ -7,33 +7,19 @@
 @stop
 
 @section('css')
-<!-- css filtro en los select  -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
-
 <!-- css para validar formularios -->
 <link rel="stylesheet" href="/css/validate.css">
 @stop
 
 @section('js')
-<!-- js para filtro en select -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/i18n/defaults-*.min.js"></script>
 
-<!-- plugins para validar formularios -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script> 
-<script>
-   $(document).ready(function() {
-      $("#producto_form").validate();
-   });
-</script>
 <script>   
     $(document).ready(function() {
         $("#producto_form").validate();
     });
 
     document.getElementById("barCodigo").focus();
-
+    //funcion muestra previa de la imagen
     function readURL(input) {
         if (input.files && input.files[0]) {
             var reader = new FileReader();
@@ -47,6 +33,28 @@
         // El listener va asignado al input
     $("#imagen").change(function() {
         readURL(this);
+    }); 
+
+    $("#categoria_id").on('change',function(e){
+            e.preventDefault();
+        var categoria_id = document.getElementById("categoria_id").value;
+        //alert(categoria_id);
+        $.ajax({
+            type:"GET",
+            url:"{{ route('subCategoriasPorCategoria.listaSubcatPorCategoria',27) }}",
+            data:{"id":categoria_id},
+
+            success:function(data){
+                var len = data.subCategorias.length;
+                $('#sub').html("");
+                $('#sub').append('<label class="form-label">Sub Categoria</label>');
+                $('#sub').append('<select class="form-control" name="sub_categoria_id" id="sub_categoria_id">'); 
+                for( var i = 0; i<len; i++){
+                    $('#sub_categoria_id').append('<option value="'+data.subCategorias[i]['id']+'">'+data.subCategorias[i]['nombre']+'</option>');
+                }    
+                $('#sub').append('</select>');
+            }
+        });
     }); 
 </script>
 

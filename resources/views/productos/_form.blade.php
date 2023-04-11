@@ -12,27 +12,26 @@
                 <label class="form-label">Categoria</label>
                 <span class="text-xs badge badge-danger">@error('categoria_id') {{ $message }} @enderror</span>
                 <select class="selectpicker form-control" name="categoria_id" id="categoria_id" data-live-search="true" required>
-                    <option value="">Category</option>
+                    <option value="">Elija Categoria</option>
                         @foreach($categorias as $categoria)                           
                             <option {{ old('categoria_id') == $categoria->id ? "selected":""}} value="{{$categoria->id}}">{{$categoria->nombre}}</option>                           
                         @endforeach           
                 </select>
             </div>
-            <div class="mb-3">
+            <div class="mb-3" id="sub">
                 <label class="form-label">Sub Categoria</label>
-                <span class="text-xs badge badge-danger">@error('sub_categoria_id') {{ $message }} @enderror</span>
                 <select class="selectpicker form-control" name="sub_categoria_id" id="sub_categoria_id" data-live-search="true" required>
-                    <option value=""> Sub Category</option>
+                        <option value=""> Elija sub categoria</option>
                         @foreach($sub_categorias as $scategoria)                           
                             <option {{ old('sub_categoria_id') == $scategoria->id ? "selected":""}} value="{{$scategoria->id}}">{{$scategoria->nombre}}</option>                           
-                        @endforeach           
+                        @endforeach 
                 </select>
             </div>
             <div class="mb-3">
                 <label class="form-label">Marca</label>
                 <span class="text-xs badge badge-danger">@error('marca_id') {{ $message }} @enderror</span>
                 <select class="selectpicker form-control" name="marca_id" data-live-search="true" required>
-                    <option value="">Select Brand</option>
+                    <option value="">Elija Marca</option>
                     @foreach($marcas as $marca)
                         <option {{old('marca_id') == $marca->id ? "selected":""}} value="{{$marca->id}}">{{$marca->nombre}}</option>
                     @endforeach            
@@ -59,11 +58,7 @@
                     </div>
                 </div>
             </div>
-            <div class="mb-6">
-                <label class="form-label">Slug</label>
-                <span class="text-xs badge badge-danger">@error('slug') {{ $message }} @enderror</span>
-                <input type="text" class="form-control" name="slug" value="{{ old('slug') }}" id="slug">               
-            </div>
+     
             <div class="mb-6">
                 <label class="form-label">Descripcion</label>
                 <span class="text-xs badge badge-danger">@error('descripcion') {{ $message }} @enderror</span>
@@ -93,3 +88,7 @@
     <a href="{{ route('productos.index') }}" class="btn btn-danger">Volver</a>
 </div>
 </div>
+
+<script>
+    
+</script>

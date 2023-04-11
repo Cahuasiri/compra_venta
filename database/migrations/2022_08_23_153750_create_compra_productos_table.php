@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('compra_productos', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('fecha');
+            $table->date('fecha');
             $table->string('referencia');
 
             $table->unsignedBigInteger('proveedor_id');
@@ -27,8 +27,17 @@ return new class extends Migration
             $table->unsignedBigInteger('tipo_pago_id');
             $table->foreign('tipo_pago_id')->references('id')->on('tipo_pagos');
 
-            $table->double('costo_total',8,2);
-            $table->string('descripcion')->nullable();            
+            $table->double('impuesto',8,2)->default('0.0');
+            $table->double('descuento',8,2)->default('0.0');
+            $table->string('nro_banco')->nullable();
+            $table->string('nro_cheque')->nullable();
+            $table->date('fecha_limite_pago')->nullable();
+
+            $table->double('sub_total',8,2);
+            $table->double('monto_pagado',8,2)->default('0.0');
+            $table->double('total',8,2);
+            $table->string('descripcion')->nullable();
+            $table->integer('usuario_id')->nullable();            
                      
             $table->timestamps();
         });

@@ -26,8 +26,13 @@ class CategoriaController extends Controller
        $categorias = new Categoria();
 
        $request->validate([
-            'nombre'     =>  'required',
+            'nombre'     =>  'required|unique:categorias',
             'descripcion'   =>  'required'
+       ],
+       [
+            'nombre.required'       => 'El nombre es Requerido',
+            'descripcion.required'  =>  'La descripcion es Requerido',
+            'nombre.unique' => 'La categoria ya Existe'
        ]);
 
        $categorias->nombre = $request->get('nombre');
@@ -67,15 +72,15 @@ class CategoriaController extends Controller
 
     public function destroy($id)
     {       
-            //Controlando si tiene dependencias
-            $producto = Producto::where('categoria_id',$id)->first();
-            if($producto === null){
-                $categoria = Categoria::find($id);  
-                $categoria->delete();
-                return redirect('categorias')->with('message','Eliminado Correctamente');
-            }
-            else{
-                return redirect('categorias')->with('message','La Categoria tiene dependencias no se puede borrar');    
-            }
+        $categoria = Categoria::find($id);
+        $productos = DB::table('productos')->where('categoria_id',$id)->get();
+        $registros= count($productos);
+        if($registros >= '1'){
+            return redirect('categorias')->with('eliminar', 'no');
+        }
+        else{
+            $categoria->delete();
+            return redirect('categorias')->with('eliminar', 'ok');
+        }    
     }
 }

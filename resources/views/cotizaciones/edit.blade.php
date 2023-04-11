@@ -89,7 +89,7 @@
                                                 <td style="text-align: center"> <input type="hidden" name="detalle_cotizacion_id[]" value="{{$dcotizacione->id}}">
                                                     <input type="hidden" name="product_id[]" value="{{ $dcotizacione->producto_id }}">{{ $dcotizacione->nombre_producto }}</td>
                                                 <td style="text-align: center">
-                                                    <input type="number" name="cantidad[]" value="{{ $dcotizacione->cantidad }}" id="cantidad" class="cantidad" style="width:50px"></td>
+                                                    <input type="number" name="cantidad[]" value="{{ $dcotizacione->cantidad }}" id="cantidad" class="cantidad" style="width:50px" min="1" required></td>
                                                 <td style="text-align: center"><input type="hidden" name="precio_unitario[]" value="{{ $dcotizacione->precio_unitario }}" id="precio" class="precio" style="width:100px">{{ $dcotizacione->precio_unitario }}</td>
                                                 <td style="text-align: center"><span class="stotal"> <?php $stotal=$dcotizacione->precio_unitario*$dcotizacione->cantidad; echo $stotal;?></span></td>
                                                 <td></td>
@@ -124,7 +124,7 @@
                                     <div class="input-group-text">
                                         Descuento
                                     </div>    
-                                    <input type="number" class="form-control" name="descuento_porcentaje" id="descuento_porcentaje" value="{{$cotizacion->descuento_porcentaje}}" placeholder="0.0" step="1" required>
+                                    <input type="number" class="form-control" name="descuento_porcentaje" id="descuento_porcentaje" value="{{$cotizacion->descuento_porcentaje}}" placeholder="0.0" step="1" min="0" required>
                                     <div class="input-group-text">
                                         %
                                     </div> 

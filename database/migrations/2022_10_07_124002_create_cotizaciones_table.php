@@ -27,6 +27,7 @@ return new class extends Migration
             $table->double('sub_total',8,2);
             $table->double('total',8,2);
             $table->string('descripcion')->nullable();
+            $table->integer('usuario_id')->nullable();
             $table->timestamps();
         });
     }

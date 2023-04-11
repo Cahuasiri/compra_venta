@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Models\Almacene;
 
 class AlmaceneController extends Controller
@@ -64,7 +65,18 @@ class AlmaceneController extends Controller
     }
 
     public function destroy($id)
-    {
+    {   
+        $almacen = Almacene::find($id);
+        $compra_producto = DB::table('compra_productos')->where('almacen_id',$id)->get();
+        $registros= count($compra_producto);
+        if($registros >= '1'){
+            return redirect('almacenes')->with('eliminar', 'no');
+        }
+        else{
+            $almacen->delete();
+            return redirect('almacenes')->with('eliminar', 'ok');
+        }
+
         $almacene = Almacene::find($id);
         $almacene->delete();
 

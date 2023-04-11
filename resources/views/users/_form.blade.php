@@ -6,16 +6,19 @@
     <div class="card-body">
         <div class="row">            
             <div class="col-sm-3"> 
-                <label class="form-label">Nombre Usuario</label>              
-                <input type="text" name="name" id="name" value="" class="form-control" required>
+                <label class="form-label">Nombre Usuario</label>
+                <span class="text-xs badge badge-danger">@error('name') {{ $message }} @enderror</span>              
+                <input type="text" name="name" id="name" value="{{old('name', $user->name) }}" class="form-control">
             </div>
             <div class="col-sm-3"> 
-                <label class="form-label">Email</label>              
-                <input type="text" name="email" id="email" value="" class="form-control" required>
+                <label class="form-label">Email</label>
+                <span class="text-xs badge badge-danger">@error('email') {{ $message }} @enderror</span>              
+                <input type="text" name="email" id="email"  value="{{old('email', $user->email) }}" class="form-control">
             </div>            
             <div class="col-sm-3">
                 <label class="form-label">Password</label>
-                <input type="password" name="password" class="form-control" required>
+                <span class="text-xs badge badge-danger">@error('password') {{ $message }} @enderror</span>
+                <input type="password" name="password" class="form-control">
             </div>
         </div>
         <div class="row mb-3">            

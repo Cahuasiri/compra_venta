@@ -18,18 +18,18 @@
             <div class="card-body">
             <p class="text-center"> <h2 class="text-center"> NOTA DE COTIZACION</h2></p>
                 <div class="row mb-4">
-                    <div class="col-6 col-md-6">
-                        <h6 class="mb-2">DE:</h6>
+                    <div class="col-sm-4">
+                        <h6 class="mb-2"><strong> DE:</strong></h6>
                         <div>
-                            <strong>CHURAS(Distribuidora)</strong>
+                            <strong>{{ $datos_empresa->nombre_empresa }}</strong>
                         </div>
                         <div>Casa Matriz</div>
-                        <div>Calle las Americas # 3456 Tarija-Bolivia</div>
-                        <div> <strong>Email: </strong> churasdistribuidora@gmail.com</div>
-                        <div> <strong>Phone:</strong>  +594-72976858</div>
+                        <div>{{$datos_empresa->direccionn}}</div>
+                        <div> <strong>Email: </strong> {{$datos_empresa->correo }}</div>
+                        <div> <strong>Phone:</strong>  +{{$datos_empresa->telefono}}</div>
                     </div>
 
-                    <div class="col-6 col-md-6">
+                    <div class="col-sm-4">
                         <h6 class="mb-2">PARA:</h6>
                         <div>
                             <strong>{{ $cliente->nombre_cliente }}</strong>
@@ -39,6 +39,9 @@
                         <div>Email: {{ $cliente->email }}</div>
                         <div>Phone: {{ $cliente->telefono }}</div>
                     </div>
+                    <div class="d-flex justify-content-end col-sm-4" class="">
+                        <img src="/{{$datos_empresa->logo}}" alt="" width="250px" height="153px">
+                    </div> 
 
                 </div>
 
@@ -84,26 +87,26 @@
                                     <td class="left">
                                         <strong>Subtotal</strong>
                                     </td>
-                                    <td class="text-right bg-light">{{ $ultimaCotizacion->sub_total }}€</td>
+                                    <td class="text-right bg-light">{{ $ultimaCotizacion->sub_total }} {{$datos_empresa->moneda}}</td>
                                 </tr>
                                 <tr>
                                     <td class="left">
                                         <strong>Descuento ({{$ultimaCotizacion->descuento_porcentaje}}%)</strong>
                                     </td>
-                                    <td class="text-right bg-light">{{$ultimaCotizacion->descuento}}€</td>
+                                    <td class="text-right bg-light">{{$ultimaCotizacion->descuento}} {{$datos_empresa->moneda}}</td>
                                 </tr>
                                 <tr>
                                     <td class="left">
                                         <strong>IVA (13%)</strong>
                                     </td>
-                                    <td class="text-right bg-light">{{$ultimaCotizacion->impuesto }}€</td>
+                                    <td class="text-right bg-light">{{$ultimaCotizacion->impuesto }} {{$datos_empresa->moneda}}</td>
                                 </tr>
                                 <tr>
                                     <td class="left">
                                         <strong>Total</strong>
                                     </td>
                                     <td class="text-right bg-light">
-                                        <strong>{{$ultimaCotizacion->total }}€</strong>
+                                        <strong>{{$ultimaCotizacion->total }} {{$datos_empresa->moneda}}</strong>
                                     </td>
                                 </tr>
                             </tbody>
@@ -119,7 +122,7 @@
                                 <td  class="text-center">-------------------------------------------</td>
                             </tr>
                             <tr>
-                                <td  class="text-center">Cotizado por:{{ auth()->user()->name }} </td>
+                                <td  class="text-center">Cotizado por:{{ $user_name }} </td>
                             </tr>
                     </table>
                 </div>

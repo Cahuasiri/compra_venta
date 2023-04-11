@@ -86,8 +86,14 @@ class RoleController extends Controller
     public function destroy($id)
     {
         $role = Role::find($id);
-        $role->delete();
-
-        return redirect('roles');
+        $rol_permisos = DB::table('role_has_permissions')->where('role_id',$id)->get();
+        $registros= count($rol_permisos);
+        if($registros >= '1'){
+            return redirect('roles')->with('eliminar', 'no');
+        }
+        else{
+            $role->delete();
+            return redirect('roles')->with('eliminar', 'ok');
+        }
     }
 }

@@ -17,9 +17,11 @@
                 <span class="float-right"> <a href="javascript:window.print()"> Imprimir </a> &nbsp; <strong>Ref.:</strong> {{$ultimaCompra->referencia}}</span>
             </div>
             <div class="card-body">
-            <p class="text-center"> <h2 class="text-center"> NOTA DE COMPRA</h2></p>
+            
+                <p class="text-center"> <h2 class="text-center"> NOTA DE COMPRA</h2></p>
+                
                 <div class="row mb-4">
-                    <div class="col-6 col-md-6">
+                    <div class="col-sm-4">
                         <h6 class="mb-2">DE:</h6>
                         <div>
                             <strong>{{ $proveedore->nombre }}</strong>
@@ -29,17 +31,19 @@
                         <div>Email: {{ $proveedore->email }}</div>
                         <div>Phone: {{ $proveedore->telefono }}</div>
                     </div>
-                    <div class="col-6 col-md-6">
-                        <h6 class="mb-2">PARA:</h6>
+                    <div class="col-sm-4">
+                        <h6 class="mb-2"><strong> PARA:</strong></h6>
                         <div>
-                            <strong>CHURAS(Distribuidora)</strong>
+                            <strong>{{ $datos_empresa->nombre_empresa }}</strong>
                         </div>
                         <div>Casa Matriz</div>
-                        <div>Calle las Americas # 3456 Tarija-Bolivia</div>
-                        <div> <strong>Email: </strong> churasdistribuidora@gmail.com</div>
-                        <div> <strong>Phone:</strong>  +594-72976858</div>
+                        <div>{{$datos_empresa->direccionn}}</div>
+                        <div> <strong>Email: </strong> {{$datos_empresa->correo }}</div>
+                        <div> <strong>Phone:</strong>  +{{$datos_empresa->telefono}}</div>
                     </div>
-
+                    <div class="d-flex justify-content-end col-sm-4" class="">
+                        <img src="/{{$datos_empresa->logo}}" alt="" width="250px" height="153px">
+                    </div>                     
                 </div>
 
                 <div class="table-responsive-sm">
@@ -53,7 +57,7 @@
                                 <th scope="col" width="10%" class="text-right">P. Unidad</th>
                                 <th scope="col" width="10%" class="text-right">P. p/Venta</th>
                                 <th scope="col" width="8%" class="text-right">Cantidad.</th>
-                                <th scope="col" width="10%" class="text-right">Total</th>
+                                <th scope="col" width="10%" class="text-right">Total </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -85,26 +89,26 @@
                                     <td class="left">
                                         <strong>Subtotal</strong>
                                     </td>
-                                    <td class="text-right bg-light">{{ $ultimaCompra->costo_total }}€</td>
+                                    <td class="text-right bg-light">{{ $ultimaCompra->sub_total }} {{$datos_empresa->moneda}}</td>
                                 </tr>
                                 <tr>
                                     <td class="left">
                                         <strong>Descuento (%)</strong>
                                     </td>
-                                    <td class="text-right bg-light">€</td>
+                                    <td class="text-right bg-light">{{ $ultimaCompra->descuento }} {{$datos_empresa->moneda}}</td>
                                 </tr>
-                                <tr>
+                                <!-- <tr>
                                     <td class="left">
                                         <strong>IVA (13%)</strong>
                                     </td>
-                                    <td class="text-right bg-light">€</td>
-                                </tr>
+                                    <td class="text-right bg-light"> {{$datos_empresa->moneda}}</td>
+                                </tr> -->
                                 <tr>
                                     <td class="left">
                                         <strong>Total</strong>
                                     </td>
                                     <td class="text-right bg-light">
-                                        <strong>{{$ultimaCompra->costo_total }}€</strong>
+                                        <strong>{{$ultimaCompra->total }} {{$datos_empresa->moneda}}</strong>
                                     </td>
                                 </tr>
                             </tbody>
@@ -119,7 +123,7 @@
                                 <td  class="text-center">-------------------------------------------</td>
                             </tr>
                             <tr>
-                                <td  class="text-center">Reg. por:{{ auth()->user()->name }} </td>
+                                <td  class="text-center">Reg. por:{{ $user_name }} </td>
                             </tr>
                     </table>
                 </div>

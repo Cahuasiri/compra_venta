@@ -46,11 +46,11 @@
                 <td></td>
                 <td style="text-align: center">{{ $cotizacione->total }}</td>
                 <td>
-                    <form action="{{ route('cotizaciones.destroy',$cotizacione->id)}}" method="POST">                    
+                    <form action="{{ route('cotizaciones.destroy',$cotizacione->id)}}" method="POST" class="formDelete">                    
                         <a href="{{ route('cotizaciones.edit', $cotizacione->id) }}" class="btn btn-primary btn-sm" title="editar"><i class="bi bi-pencil-square"></i></a>                     
                         @csrf
                         @method('DELETE')                    
-                        <button type="submit" class="btn btn-danger btn-sm" title="borrar" onclick="alert('Esta seguro de eliminar?')">
+                        <button type="submit" class="btn btn-danger btn-sm" title="borrar">
                             <i class="bi bi-trash text-light"></i></button>                    
                     </form>
                 </td>
@@ -68,7 +68,26 @@
     <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.3.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.3.0/js/responsive.bootstrap5.min.js"></script>
-  
+    @if(session('eliminar') == 'ok')
+        <script>
+            Swal.fire(
+                'Eliminado!',
+                'La cotización ha sido Eliminado con Exito.',
+                'success'
+            )
+        </script>
+    @endif
+    @if(session('eliminar') == 'no')
+        <script>
+            Swal.fire(
+                'Error!',
+                'No se puede eliminar tiene dependencias',
+                'error'
+            )
+        </script>
+    @endif
+
+    
 <script>
     $('#cotizaciones').DataTable({
         responsive:true,
@@ -86,6 +105,24 @@
                 'previous':"Anterior"
             }
         }
+    });
+
+    $('.formDelete').submit( function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Esta seguro de Eliminar la Cotización?',
+            text: "si no lo esta puede cancelar la accion!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Si, Eliminar!',
+            cancelButtonText: 'Cancelar'
+            }).then((result) => {
+            if (result.isConfirmed) {
+                this.submit();
+            }
+            });
     });
 </script>
 

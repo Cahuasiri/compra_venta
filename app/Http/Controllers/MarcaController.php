@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Models\Marca;
 use App\Models\Producto;
 
@@ -106,15 +107,15 @@ class MarcaController extends Controller
      */
     public function destroy($id)
     {
-         //Controlando si tiene dependencias
-         $producto = Producto::where('marca_id',$id)->first();
-         if($producto === null){
-             $marca = Marca::find($id);  
-             $marca->delete();
-             return redirect('marcas')->with('message','Eliminado Correctamente');
-         }
-         else{
-             return redirect('marcas')->with('message','La Categoria tiene dependencias no se puede borrar');    
-         }
+        $marca = Marca::find($id);
+        $producto = DB::table('productos')->where('marca_id',$id)->get();
+        $registros= count($producto);
+        if($registros >= '1'){
+            return redirect('marcas')->with('eliminar', 'no');
+        }
+        else{
+            $marca->delete();
+            return redirect('marcas')->with('eliminar', 'ok');
+        } 
     }
 }

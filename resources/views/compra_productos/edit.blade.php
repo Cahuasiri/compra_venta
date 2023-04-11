@@ -3,18 +3,19 @@
 @section('title', 'Admin')
 
 @section('content')
-<div class="card card-outline card-primary mt-2">
-    <div class="card-header">
-        <span>Ingrese sus datos en el formulario</span>
-    </div>
+<form action="{{route('compra_productos.update', $compras)}}" method="POST" id="basic-form">
+@csrf
+@method('PUT')
+<div class="card card-outline card-info mt-2">
+    <!-- CABECERA -->
+    <div class="card-header"> <span>Actualizacion de Datos de <strong>COMPRA</strong> </span></div>
+    <!-- CUERPO -->
     <div class="card-body">
-        <form action="{{route('compra_productos.update', $compras)}}" method="POST" id="basic-form">
-        @csrf
-        @method('PUT') 
+        <!-- fecha y referecia -->
         <div class="row">
             <div class="col-sm-4">
                 <label for="">Fecha <span>*</span></label>
-                <input type="datetime-local" class="form-control" name="fecha_compra" value="{{$compras->fecha}}" required>
+                <input type="date" class="form-control" name="fecha_compra" value="{{$compras->fecha}}" required>
             </div>
             <div class="col-sm-4">
                 <label for="">Referencia/Nro. Orden <span>*</span></label>
@@ -34,7 +35,8 @@
                 </select>
             </div>
         </div>
-        <div class="row mt-3">
+        <!-- proveedor -->
+        <div class="row">
             <div class="col-sm-12">
                 <label for="">Proveedor <span>*</span></label>  
                 <div class="input-group mb-3">    
@@ -56,101 +58,157 @@
                 </div>                   
             </div>
         </div>
-        <div class="row">             
+        <!-- agregar producto -->
+        <div class="row">
             <div class="col-sm-12">
-            <div class="card card-primary mb-2">
-                    <div class="card-header">
-                       Agregar los productos que van a ingresar al Sistema
-                    </div>
-                    <div class="card-body">              
-                        <div class="row">
-                            <div class="col-sm-12">
-                            <div class="input-group mb-3">                                        
-                                <select name="producto_id" id="producto_id" class="form-select" data-placeholder="Seleccione un Producto" disabled>
-                                    <option value=""></option>
-                                    @foreach($productos as $producto)
-                                        <option value="{{$producto->id}}"> {{$producto->barCodigo}} - {{$producto->nombre_producto}}</option>
-                                    @endforeach
-                                </select>
-                                <div class="input-group-text">
-                                    <a href="#" class="btn btn-primary btn-sm"><i class='fas fa-tags blue-color'></i></a> &nbsp;
-                                    <a href="{{ route('productos.create') }}" class="btn btn-primary btn-sm"><i class='fas fa-plus-square blue-color'></i></a>
-                                </div>
+            <div class="card card-info mb-2">
+                <div class="card-header">
+                    Agregar los productos que van a ingresar al Sistema
+                </div>
+                <div class="card-body"> 
+                    <!-- select de productos -->             
+                    <div class="row">
+                    <div class="col-sm-12">
+                        <div class="input-group mb-3">                                        
+                            <select name="producto_id" id="producto_id" class="form-select" data-placeholder="Seleccione un Producto" disabled>
+                                <option value=""></option>
+                                @foreach($productos as $producto)
+                                <option value="{{$producto->id}}"> {{$producto->barCodigo}} - {{$producto->nombre_producto}}</option>
+                                @endforeach
+                            </select>
+                            <div class="input-group-text">
+                                <a href="#" class="btn btn-primary btn-sm"><i class='fas fa-tags blue-color'></i></a> &nbsp;
+                                <a href="{{ route('productos.create') }}" class="btn btn-primary btn-sm"><i class='fas fa-plus-square blue-color'></i></a>
                             </div>
-                            <div class="card w-100 card-outline card-info" >
-                                <div class="card-body">     
+                        </div>
+                    </div>
+                    </div>
+                    <!-- Tabla de productos agregados --> 
+                    <div class="row">
+                    <div class="col-sm-12">
+                        <div class="card w-100 card-outline card-info" >
+                            <div class="card-body">     
                                 <table class="display responsive nowra" width="100%" style="border: 1px;" id="myTable">
                                     <thead style="background-color:#f8f9fa">
                                         <tr>
-                                        <th>Producto (código - Nombre)</th>
-                                        <th>Cantidad</th> 
-                                        <th>Precio - Compra)</th>
-                                        <th>Precio - Venta</th>
-                                        <th>SubTotal</th>                         
-                                        <th></th>
+                                            <th>Producto (código - Nombre)</th>
+                                            <th>Cantidad</th> 
+                                            <th>Precio - Compra)</th>
+                                            <th>Precio - Venta</th>
+                                            <th>SubTotal</th>                         
+                                            <th></th>
                                         </tr>                            
                                     </thead>
                                     <tbody id="capaproductos">
                                         <?php $total = 0;?>
-                                        @foreach($detalle_productos as $dproducto)                                                                                        
-                                            <tr>
-                                                <td> <input type="hidden" name="detalle_producto_id[]" value="{{$dproducto->id}}">
-                                                    <input type="hidden" name="product_id[]" value="{{ $dproducto->producto_id }}">{{ $dproducto->nombre_producto }}</td>
-                                                <td>
-                                                    <input type="number" name="cantidad[]" value="{{ $dproducto->cantidad }}" id="cantidad" class="cantidad" style="width:100px"></td>
-                                                <td><input type="number" name="costo[]" value="{{ $dproducto->costoCompra }}" id="costo" class="costo" style="width:100px"></td>
-                                                <td><input type="number" name="precio[]" value="{{ $dproducto->costoVenta }}" id="" class="form-control" style="width:100px"></td>
-                                                <td style="text-align: center"><span class="stotal"><?php $stotal = $dproducto->cantidad*$dproducto->costoCompra; echo $stotal; ?> </span></td>
-                                                <td></td>
-                                            </tr>
-                                            <?php $total = $total + $stotal; ?>
-                                        @endforeach
+                                            @foreach($detalle_productos as $dproducto)                                                                                        
+                                                <tr>
+                                                    <td> <input type="hidden" name="detalle_producto_id[]" value="{{$dproducto->id}}">
+                                                        <input type="hidden" name="product_id[]" value="{{ $dproducto->producto_id }}">{{ $dproducto->nombre_producto }}</td>
+                                                    <td>
+                                                        <input type="number" name="cantidad[]" value="{{ $dproducto->cantidad }}" id="cantidad" class="cantidad" style="width:100px" min="1"></td>
+                                                    <td><input type="number" name="costo[]" value="{{ $dproducto->costoCompra }}" id="costo" class="costo" style="width:100px" min="0"></td>
+                                                    <td><input type="number" name="precio[]" value="{{ $dproducto->costoVenta }}" id="" class="form-control" style="width:100px" min="0"></td>
+                                                    <td style="text-align: center"><span class="stotal"><?php $stotal = $dproducto->cantidad*$dproducto->costoCompra; echo $stotal; ?> </span></td>
+                                                    <td></td>
+                                                </tr>
+                                                <?php $total = $total + $stotal; ?>
+                                            @endforeach
                                     </tbody>
                                     <tfoot>
                                         <tr>
                                             <th colspan="4" style="text-align: right">Totales</th>
+                                            <input type="hidden" name="sub_total" id="sub_total" value="{{$compras->sub_total}}">
                                             <th style="text-align: center"><span class="total"> <?php echo $total;?> </span></th>
                                             <th></th>
                                         </tr>
                                     </tfoot>                        
                                 </table>
-                                </div>
                             </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="input-group mb-3">
-                                    <div class="input-group-text">
-                                        Tipo pago
-                                    </div>    
-                                    <select class="form-select" id="tipo_pago" data-placeholder="Seleccione Proveedor" name="tipo_pago_id" required>
-                                        @foreach($tipo_pagos as $tipo_pago)
-                                            @if($tipo_pago->id == $compras->tipo_pago_id)
-                                                <option value="{{$tipo_pago->id}}" selected>{{$tipo_pago->nombre}}</option>
-                                            @else
-                                                <option value="{{$tipo_pago->id}}">{{$tipo_pago->nombre}}</option>
-                                            @endif
-                                                                                  
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="form-outline">
-                                    <label class="form-label" for="textAreaExample">Alguna observacion</label>
-                                    <textarea class="form-control" id="textAreaExample1" rows="2" name="descripcion">{{$compras->descripcion}}</textarea>                                    
-                                </div>
-                            </div>   
-                        </div>                            
+                        </div>
                     </div>
-                </div>                
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end mb-2 card-footer">
+                    <div class="col-sm-3">
+                    <div class="input-group mb-0">
+                        <div class="input-group-text">
+                            Total
+                        </div>    
+                        <input type="number" class="form-control" name="total" id="total" value="{{$compras->total}}"  style="width: 160px;" min="0" required>
+                        <input type="hidden" class="form-control" name="descuento_mo" id="descuento_mo" value="{{$compras->descuento}}"  style="width: 160px;" required>
+                    </div>
+                    </div>
+                </div>                            
             </div>
-        </div>      
+            </div>
+        </div>
+        <!-- descuento y totales a pagar -->
+        <div class="row">
+            <div class="col-sm-3">
+            <div class="input-group mb-3">
+                <div class="input-group-text">
+                    Tipo pago
+                </div>    
+                <select class="form-control" id="tipo_pago_id" data-placeholder="Seleccione Proveedor" name="tipo_pago_id" required>
+                    @foreach($tipo_pagos as $tipo_pago)
+                        @if($tipo_pago->id == $compras->tipo_pago_id)
+                            <option value="{{$tipo_pago->id}}" selected>{{$tipo_pago->nombre}}</option>
+                        @else
+                            <option value="{{$tipo_pago->id}}">{{$tipo_pago->nombre}}</option>
+                        @endif
+                    @endforeach
+                </select>
+            </div>
+            </div>
+            <div class="col-sm-3" id="fecha_limite">
+            <div class="input-group mb-3">
+                <div class="input-group-text">
+                    Fec. Limite
+                </div>    
+                <input type="date" class="form-control" name="fecha_limite" id="fecha_limite" value="{{$compras->fecha_limite_pago}}" required>
+            </div>
+            </div>
+            <div class="col-sm-3" id="nro_banco">
+            <div class="input-group mb-3">
+                <div class="input-group-text">
+                    Banco Nro.
+                </div>    
+                <input type="text" class="form-control" name="nro_banco" id="nro_banco" value="{{$compras->nro_banco}}" required>
+            </div>
+            </div>
+            <div class="col-sm-3" id="nro_cheque">
+            <div class="input-group mb-3">
+                <div class="input-group-text">
+                    Nro de Cheque
+                </div>    
+                <input type="text" class="form-control" name="nro_cheque" id="nro_cheque" value="{{$compras->nro_cheque}}" required>
+            </div>
+            </div>
+            <div class="col-sm-3" id="descuento">
+            <div class="input-group mb-3">
+                <div class="input-group-text">
+                    Desc. en %
+                </div> 
+                <?php $descuento_por = $compras->descuento*100/$compras->sub_total; ?>   
+                <input type="number" class="form-control" name="descuento_por" id="descuento_por" value="{{$descuento_por}}" step="1" min="0" required>
+            </div>
+            </div>
+        </div>
+        <!-- descripcion -->
+        <div class="row">
+        <div class="form-outline">
+            <label class="form-label" for="textAreaExample">Alguna observacion</label>
+            <textarea class="form-control" id="textAreaExample1" rows="2" name="descripcion">{{$compras->descripcion}}</textarea>                                    
+        </div>
     </div>
+    <!-- PIE -->
     <div class="d-flex justify-content-center mb-2 card-footer">
-            <input type="submit" value="Guardar" class="btn btn-primary"> &nbsp;
-            <a href="{{ route('compra_productos.index') }}" class="btn btn-danger">Volver</a>
-            
+        <input type="submit" value="Guardar" class="btn btn-primary"> &nbsp;
+        <a href="{{ route('compra_productos.index') }}" class="btn btn-danger">Volver</a>
     </div>
-    </form>
 </div>
+</form>
 @stop
 
 @section('css')
@@ -174,7 +232,21 @@
     var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
      $(document).ready(function(){
 
+        $('#fecha_limite').hide();
+        $('#nro_banco').hide();
+        $('#nro_cheque').hide();
+
         $("#basic-form").validate();
+        var id = $('#tipo_pago_id').val();
+        if(id == 3){
+            $('#nro_banco').show();
+        }
+        if(id == 4){
+            $('#nro_cheque').show();
+        }
+        if(id == 2){
+            $('#fecha_limite').show();
+        }
 
         $("#myTable").on('change','.cantidad', function(){
             var currentRow=$(this).closest("tr");
@@ -189,6 +261,8 @@
                 total += parseFloat($(this).find('td').eq(4).text());                
             });
             $('#myTable tfoot tr th').eq(1).text(total);
+            $('#sub_total').val(total);
+            $("#total").val(total.toFixed(2));
         });
 
         $("#myTable").on('change','.costo', function(){
@@ -204,6 +278,8 @@
                 total += parseFloat($(this).find('td').eq(4).text());                
              });
              $('#myTable tfoot tr th').eq(1).text(total);
+             $('#sub_total').val(total);
+             $("#total").val(total.toFixed(2));
          });
 
         $('#producto_id').select2({
@@ -235,7 +311,50 @@
             },
                 cache: true
             }
-        } );   
+        } ); 
+        //tipo de pagos
+        $('#tipo_pago_id').on('change', function(){
+            var id = $('#tipo_pago_id').val();
+            if(id == 1){
+                $('#fecha_limite').hide();
+                $('#nro_banco').hide();
+                $('#descuento').show();
+                $('#nro_cheque').hide();
+                $('#descuento').focus();
+            }
+            if(id == 2){
+                $('#fecha_limite').show();
+                $('#nro_banco').hide();
+                $('#descuento').show();
+                $('#nro_cheque').hide();
+                $('#fecha_limite').focus();
+            }
+            if(id == 3){
+                $('#fecha_limite').hide();
+                $('#nro_banco').show();
+                $('#descuento').show();
+                $('#nro_cheque').hide();
+                $('#nro_banco').focus();
+            }
+            if(id == 4){
+                $('#fecha_limite').hide();
+                $('#nro_banco').hide();
+                $('#descuento').show();
+                $('#nro_cheque').show();
+                $('#nro_cheque').focus();
+            }
+            
+        });
+        //operaciones con el descuento
+        $("#descuento_por").on('change', function(){
+            var sub_total = $('#sub_total').val();
+            var descuento = $('#descuento_por').val();
+            var monto_desc = parseFloat(sub_total)*parseFloat(descuento)/100;
+            $('#descuento_mo').val(monto_desc.toFixed(2));
+
+            var monto_pagar = parseFloat(sub_total) - parseFloat(monto_desc);
+            $('#total').val(monto_pagar.toFixed(2));           
+        });  
         
     });
 

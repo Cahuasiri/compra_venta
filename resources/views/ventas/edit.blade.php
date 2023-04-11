@@ -5,7 +5,7 @@
 @section('content')
 <div class="card card-outline card-success mt-2">
     <div class="card-header">
-        <span>Ingrese sus datos en el formulario</span>
+        <span>Actualizacion de Datos de <strong>VENTA</strong> </span>
     </div>
     <div class="card-body">
         <form action="{{route('ventas.update', $venta)}}" method="POST" id="form_venta">
@@ -93,7 +93,7 @@
                                                 <td style="text-align: center"> <input type="hidden" name="detalle_venta_id[]" value="{{$dventa->id}}">
                                                     <input type="hidden" name="product_id[]" value="{{ $dventa->producto_id }}">{{$producto->barCodigo}} - {{ $dventa->nombre_producto }}</td>
                                                 <td style="text-align: center">
-                                                    <input type="number" name="cantidad[]" value="{{ $dventa->cantidad }}" id="cantidad" class="cantidad" style="width:50px"></td>
+                                                    <input type="number" name="cantidad[]" value="{{ $dventa->cantidad }}" min="1" id="cantidad" class="cantidad" style="width:50px"></td>
                                                 <td style="text-align: center"><input type="hidden" name="precio_unitario[]" value="{{ $dventa->precio_unitario }}" id="precio" class="precio" style="width:100px">{{ $dventa->precio_unitario }}</td>
                                                 <td style="text-align: center"><span class="stotal"> <?php $stotal=$dventa->precio_unitario*$dventa->cantidad; echo $stotal;?></span></td>
                                                 <td></td>
@@ -129,7 +129,7 @@
                                     <div class="input-group-text">
                                         Descuento
                                     </div>    
-                                    <input type="number" class="form-control" name="descuento_porcentaje" id="descuento_porcentaje" value="{{$venta->descuento_porcentaje}}" placeholder="0.0" step="0.01" required>
+                                    <input type="number" class="form-control" name="descuento_porcentaje" min="0" id="descuento_porcentaje" value="{{$venta->descuento_porcentaje}}" placeholder="0" step="1" required>
                                     <div class="input-group-text">
                                         %
                                     </div> 
@@ -355,7 +355,7 @@
             success:function(data){
                 var html = '';                
                 $('#capaproductos').append('<tr> <td><input type="hidden" name="product_id[]" value="'+ data.producto.id +'">'+ data.producto.producto +'</td>' +
-                                            '<td style="text-align: center"><input type="number" name="cantidad[]" value="1" id="cantidad" class="cantidad" style="width:50px" required></td>'+
+                                            '<td style="text-align: center"><input type="number" name="cantidad[]" value="1" min="1"id="cantidad" class="cantidad" style="width:50px" required></td>'+
                                             '<td style="text-align: center"><input type="hidden" name="precio_unitario[]" id="precio" value="'+data.producto.costoVenta+'" class="precio" style="width:100px">'+data.producto.costoVenta +'</td>' +
                                             '<td style="text-align: center"><span class="stotal">'+data.producto.costoVenta.toFixed(2)+ '</span></td>' +                                           
                                             '<td><a href="javascript:void(0);" class="remove_button"><i class="fa fa-trash" style="color: red"></i></a></td>')                                

@@ -9,6 +9,10 @@ use App\Models\Cliente;
 use App\Models\Producto;
 use App\Models\Grupo_cliente;
 use DateTime;
+use App\Models\Datos_empresa;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+
 
 class CotizacioneController extends Controller
 {
@@ -24,12 +28,25 @@ class CotizacioneController extends Controller
     {
         $clientes = Cliente::all();
         $productos = Producto::where('estado','A')->get();
-        $grupo_clientes = Grupo_cliente::all();       
-       
+        $grupo_clientes = Grupo_cliente::all();
+        $datos_empresa = Datos_empresa::find(1);
+        
+        //sacar ventareferencia para incrementar en 1
+        $cotizacion = Cotizacione::orderBy('referencia','desc')->limit(1)->get();
+        if(empty($cotizacion)){
+            $referencia = $cotizacion[0]['referencia'];
+            $newReferencia = $referencia +1;
+        }
+        else{
+            $newReferencia = $datos_empresa->compra_referencia;
+        }
+      
         $date = new DateTime(); // Date object using current date and time
         $dt= $date->format('Y-m-d\TH:i:s'); 
        
-       return view('cotizaciones.create', ['productos'=>$productos, 'clientes'=>$clientes, 'dt'=>$dt, 'grupo_clientes'=>$grupo_clientes]);
+       return view('cotizaciones.create', ['productos'=>$productos, 'clientes'=>$clientes, 'dt'=>$dt, 
+                    'grupo_clientes'=>$grupo_clientes, 
+                    'datos_empresa'=>$datos_empresa, 'referencia'=>$newReferencia]);
     }
 
     public function store(Request $request)
@@ -56,13 +73,20 @@ class CotizacioneController extends Controller
         $producto_id = $request->get('product_id');
         $cantidad = $request->get('cantidad');
         $precio_unitario = $request->get('precio_unitario');
-       
+
+        //usuario
+        $usuario_id = Auth::id();
+        $cotizacion->usuario_id = $usuario_id;
+
         //guardar venta en la base de datos
         $cotizacion->save();
 
         //buscar la ultima venta ingresado
         $ultimaCotizacion = Cotizacione::latest()->first();
         $cotizacion_id = $ultimaCotizacion->id;
+
+        //sacar usuario de cotizacion
+        $user = User::find($ultimaCotizacion->usuario_id);
 
         if($producto_id != null){
            
@@ -83,7 +107,10 @@ class CotizacioneController extends Controller
                                         ->where('cotizacion_id', $cotizacion_id)
                                         ->get();
         $cliente = Cliente::find($cotizacion->cliente_id);
-       return view('cotizaciones.recibo', ['ultimaCotizacion'=>$ultimaCotizacion, 'detalle_cotizaciones'=>$detalle_cotizaciones, 'cliente'=>$cliente]);
+        $datos_empresa = Datos_empresa::find(1);  
+       return view('cotizaciones.recibo', ['ultimaCotizacion'=>$ultimaCotizacion, 'detalle_cotizaciones'=>$detalle_cotizaciones, 
+                                        'cliente'=>$cliente, 'datos_empresa'=>$datos_empresa,
+                                        'user_name'=>$user->name]);
       // return redirect('cotizaciones');
     }
 
@@ -153,11 +180,16 @@ class CotizacioneController extends Controller
 
         //buscar para imprimir
         $cotizacion = Cotizacione::find($id);
+        $user = User::find($cotizacion->usuario_id);
+
         $detalle_cotizaciones = Detalle_cotizacione::JOIN('productos','productos.id','=','detalle_cotizaciones.producto_id')
                                         ->where('cotizacion_id', $id)
                                         ->get();
         $cliente = Cliente::find($cotizacion->cliente_id);
-       return view('cotizaciones.recibo', ['ultimaCotizacion'=>$cotizacion, 'detalle_cotizaciones'=>$detalle_cotizaciones, 'cliente'=>$cliente]);
+        $datos_empresa = Datos_empresa::find(1);  
+       return view('cotizaciones.recibo', ['ultimaCotizacion'=>$cotizacion, 'detalle_cotizaciones'=>$detalle_cotizaciones, 
+                                        'cliente'=>$cliente, 'datos_empresa'=>$datos_empresa,
+                                        'user_name'=>$user->name]);
        //return redirect('cotizaciones');
     }
 
@@ -169,6 +201,6 @@ class CotizacioneController extends Controller
         $cotizacion = Cotizacione::find($id);
         $cotizacion->delete();
 
-        return redirect('cotizaciones');
+        return redirect('cotizaciones')->with('eliminar', 'ok');;
     }
 }

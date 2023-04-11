@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use App\Models\Model_has_role;
+
 
 use App\Models\Persona;
 
@@ -19,14 +21,27 @@ class UserController extends Controller
 
     public function create()
     {
-        $personas = Persona::all();
-        return view('users.create', ['personas'=>$personas]);
+       // $personas = Persona::all();
+       $user = new User();
+        return view('users.create', ['user'=>$user]);
     }
 
     public function store(Request $request)
     {   
         $user = new User();
        // $persona = Persona::find($request->get('persona_id'));
+       $request->validate([
+        'name'     =>   'required',
+        'email'     =>  'required|unique:users|email:rfc,dns',
+        'password'   =>  'required'
+        ],
+        [
+            'name.required'       => 'El nombre es Requerido',
+            'email.required'  =>  'El campo es obligatorio',
+            'email.unique'    => 'El Correo ya Existe',
+            'email.email'     => 'Debe ser un correo Valido',
+            'password.required' => 'Campo Requerido'
+        ]);       
 
         $user->name = $request->get('name');
         $user->email = $request->get('email');
@@ -59,8 +74,21 @@ class UserController extends Controller
     {   
         //$user = new User();
         $users = User::find($id);
-        $user->name = $request->get('name');
-        $user->email = $request->get('email');
+        $request->validate([
+            'name'     =>   'required',
+            'email'     =>  'required|email:rfc,dns',
+            'password'   =>  'required'
+            ],
+            [
+                'name.required'       => 'El nombre es Requerido',
+                'email.required'  =>  'El campo es obligatorio',
+                'email.unique'    => 'El Correo ya Existe',
+                'email.email'     => 'Debe ser un correo Valido',
+                'password.required' => 'Campo Requerido'
+            ]);
+
+        $users->name = $request->get('name');
+        $users->email = $request->get('email');
         $users->password = bcrypt($request->get('password'));
         $users->save();
 
@@ -72,9 +100,15 @@ class UserController extends Controller
     public function destroy($id)
     {
         $user = User::find($id);
-        $user->delete();
-
-        return redirect('users');
+        $user_rol = DB::table('model_has_roles')->where('model_id',$id)->get();
+        $registros= count($user_rol);
+        if($registros >= '1'){
+            return redirect('users')->with('eliminar', 'no');
+        }
+        else{
+            $user->delete();
+            return redirect('users')->with('eliminar', 'ok');
+        }
     }
 
     public function asignar_roles(Request $request, User $user){
